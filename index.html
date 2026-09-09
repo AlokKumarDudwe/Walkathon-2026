@@ -100,6 +100,11 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
 .del-btn:hover{color:var(--red)}
 .login-wrap{max-width:320px;margin:40px auto}
 .mono{font-family:'Courier New',monospace}
+.gen-card.sel-m{border-color:#1a7a3f!important;background:#e8f5ee!important}
+.gen-card.sel-f{border-color:#c0392b!important;background:#fdf0ef!important}
+.sz-card{background:var(--s2);border:2px solid var(--b1);border-radius:var(--rsm);padding:10px 6px;text-align:center;cursor:pointer;font-weight:700;font-size:.85rem;color:var(--t2);transition:all .2s}
+.sz-card:hover{border-color:var(--green)}
+.sz-card.sel{border-color:var(--green);background:var(--green2);color:var(--green)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{display:inline-block;animation:spin .8s linear infinite}
 
@@ -191,6 +196,31 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
           <label>Email Address <span class="req">*</span></label>
           <input class="fi" id="n-email" placeholder="your.email@ongc.co.in" type="email" inputmode="email"/>
         </div>
+        <div class="fg">
+          <label>Gender <span class="req">*</span></label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="gen-card" id="gen-m" onclick="pickGender('M')" style="background:var(--s2);border:2px solid var(--b1);border-radius:var(--rsm);padding:12px;text-align:center;cursor:pointer;transition:all .2s">
+              <div style="font-size:1.5rem;margin-bottom:4px">👨</div>
+              <div style="font-size:.85rem;font-weight:700">Male</div>
+            </div>
+            <div class="gen-card" id="gen-f" onclick="pickGender('F')" style="background:var(--s2);border:2px solid var(--b1);border-radius:var(--rsm);padding:12px;text-align:center;cursor:pointer;transition:all .2s">
+              <div style="font-size:1.5rem;margin-bottom:4px">👩</div>
+              <div style="font-size:.85rem;font-weight:700">Female</div>
+            </div>
+          </div>
+        </div>
+        <div class="fg">
+          <label>T-Shirt Size <span class="req">*</span></label>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px" id="tshirt-grid">
+            <div class="sz-card" id="sz-XS" onclick="pickSize('XS')">XS</div>
+            <div class="sz-card" id="sz-S"  onclick="pickSize('S')">S</div>
+            <div class="sz-card" id="sz-M"  onclick="pickSize('M')">M</div>
+            <div class="sz-card" id="sz-L"  onclick="pickSize('L')">L</div>
+            <div class="sz-card" id="sz-XL" onclick="pickSize('XL')">XL</div>
+            <div class="sz-card" id="sz-XXL" onclick="pickSize('XXL')" style="grid-column:span 2">XXL</div>
+            <div class="sz-card" id="sz-XXXL" onclick="pickSize('XXXL')" style="grid-column:span 3">XXXL</div>
+          </div>
+        </div>
         <div id="reg-err" class="al al-err" style="display:none"></div>
         <button class="btn btn-green btn-full" id="reg-btn" onclick="submitReg()">
           🚶 Register for Walkathon
@@ -260,7 +290,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
 
       <div class="tbl-wrap">
         <table class="dtbl">
-          <thead><tr><th>Token</th><th>Name</th><th>CPF/ID</th><th>Mobile</th><th>Email</th><th>Registered</th><th></th></tr></thead>
+          <thead><tr><th>Token</th><th>Name</th><th>CPF/ID</th><th>Mobile</th><th>Gender</th><th>T-Shirt</th><th>Email</th><th>Date</th><th></th></tr></thead>
           <tbody id="adm-tbody"></tbody>
         </table>
       </div>
@@ -279,11 +309,11 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
 'use strict';
 
 // ── CONFIG ─────────────────────────────────
-const ADMIN_PASS   = 'walk2026';
+const ADMIN_PASS   = 'ongctt2026';
 const MAX_SPOTS    = 250;
 const SETTINGS_KEY = 'walkathon_cfg';
 // !! PASTE YOUR APPS SCRIPT URL BELOW AFTER DEPLOYMENT !!
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxMSeiSwr0g4bee1SW10y3RtKad1Nh33cO4v1tGhvBQ-Ynk1b7hVXmX7jXpScmlmkw/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxGMorpcrl4mR6qqpzn3eiCAEKdDB9t4W4C5tI4ORfK8JmjxVTy0zqpy-Bf6S_Llew/exec';
 
 // ── SETTINGS ───────────────────────────────
 function getCfg(){ try{ return JSON.parse(localStorage.getItem(SETTINGS_KEY))||{}; }catch(e){ return {}; } }
@@ -348,6 +378,21 @@ function updateSpots(total){
 }
 
 // ── REGISTRATION ────────────────────────────
+let selGender='', selSize='';
+
+function pickGender(g){
+  selGender=g;
+  document.getElementById('gen-m').className='gen-card'+(g==='M'?' sel-m':'');
+  document.getElementById('gen-f').className='gen-card'+(g==='F'?' sel-f':'');
+}
+
+function pickSize(s){
+  selSize=s;
+  document.querySelectorAll('.sz-card').forEach(el=>el.classList.remove('sel'));
+  const el=document.getElementById('sz-'+s);
+  if(el) el.classList.add('sel');
+}
+
 function showErr(m){ const e=document.getElementById('reg-err'); e.textContent=m; e.style.display='block'; }
 function hideErr(){ document.getElementById('reg-err').style.display='none'; }
 
@@ -372,13 +417,15 @@ async function submitReg(){
   if(!cpf || !/^\d{4,7}$/.test(cpf)){ showErr('Please enter a valid numeric Employee ID (4–7 digits).'); return; }
   if(!mob  || !/^\d{10}$/.test(mob)) { showErr('Please enter a valid 10-digit mobile number.'); return; }
   if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showErr('Please enter a valid email address.'); return; }
+  if(!selGender){ showErr('Please select your gender.'); return; }
+  if(!selSize)  { showErr('Please select your T-Shirt size.'); return; }
 
   const btn = document.getElementById('reg-btn');
   btn.disabled = true;
   btn.innerHTML = '<span class="spin">⏳</span> Registering…';
 
   try{
-    const res = await gas('add', { name, cpf, mob, email });
+    const res = await gas('add', { name, cpf, mob, email, gender:selGender, tshirt:selSize });
     btn.disabled = false;
     btn.innerHTML = '🚶 Register for Walkathon';
 
@@ -401,6 +448,9 @@ async function submitReg(){
 
 function resetReg(){
   ['n-name','n-cpf','n-mob','n-email'].forEach(id => document.getElementById(id).value = '');
+  selGender=''; selSize='';
+  ['gen-m','gen-f'].forEach(id=>document.getElementById(id).className='gen-card');
+  document.querySelectorAll('.sz-card').forEach(el=>el.classList.remove('sel'));
   document.getElementById('reg-form').style.display = 'block';
   document.getElementById('reg-ok').style.display   = 'none';
   hideErr();
@@ -470,6 +520,8 @@ function renderTable(){
     + '<td><strong>'+p.name+'</strong></td>'
     + '<td class="mono" style="color:var(--green)">'+p.cpf+'</td>'
     + '<td class="mono">'+p.mob+'</td>'
+    + '<td style="font-size:.75rem">'+(p.gender==='Male'?'👨 M':'👩 F')+'</td>'
+    + '<td><span style="background:#e8f5ee;color:var(--green);border:1px solid #a3d9b1;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:700">'+( p.tshirt||'—')+'</span></td>'
     + '<td style="font-size:.72rem;color:var(--t2)">'+p.email+'</td>'
     + '<td style="font-size:.7rem;color:var(--t3)">'+( p.ts||'—')+'</td>'
     + '<td><button class="del-btn" onclick="delParticipant('+p.id+')">🗑</button></td>'
@@ -500,12 +552,12 @@ async function clearAll(){
 function dlXLSX(){
   if(!participants.length){ alert('No data. Click Refresh first.'); return; }
   const wb  = XLSX.utils.book_new();
-  const rows = [['Token','Name','CPF/ID','Mobile','Email','Registered On']];
+  const rows = [['Token','Name','CPF/ID','Mobile','Gender','T-Shirt','Email','Registered On']];
   participants.forEach(p => rows.push([
-    '#'+String(p.token||'').padStart(3,'0'), p.name, p.cpf, p.mob, p.email, p.ts||''
+    '#'+String(p.token||'').padStart(3,'0'), p.name, p.cpf, p.mob, p.gender||'', p.tshirt||'', p.email, p.ts||''
   ]));
   const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols'] = [{wch:8},{wch:28},{wch:10},{wch:14},{wch:30},{wch:18}];
+  ws['!cols'] = [{wch:8},{wch:28},{wch:10},{wch:14},{wch:8},{wch:8},{wch:30},{wch:18}];
   XLSX.utils.book_append_sheet(wb, ws, 'Walkathon 2026');
   XLSX.writeFile(wb, 'Walkathon_2026_Registrations_'+new Date().toISOString().slice(0,10)+'.xlsx');
 }
