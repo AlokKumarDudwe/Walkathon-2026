@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Walkathon 2026 — ONGC Periyar Birth Anniversary</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f7fa;--s1:#ffffff;--s2:#f0f4f8;--b1:#dde3ed;
+  --green:#1a7a3f;--green2:#e8f5ee;--gold:#c8922a;--gold2:#fdf3e3;
+  --red:#c0392b;--t1:#1a2340;--t2:#4a5568;--t3:#8899bb;
+  --rsm:8px;--rmd:12px;--rlg:16px;
+}
+body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#1a4a2e 0%,#2d7a4f 100%);padding:0;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.hdr-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 20px}
+.hdr-brand{display:flex;align-items:center;gap:10px}
+.hdr-logo{font-size:1.8rem}
+.hdr-title{font-weight:800;font-size:.95rem;color:#fff;line-height:1.2}
+.hdr-sub{font-size:.68rem;color:rgba(255,255,255,.75);margin-top:1px}
+.htab{padding:7px 16px;border-radius:999px;font-size:.78rem;font-weight:700;border:1.5px solid rgba(255,255,255,.3);background:transparent;color:rgba(255,255,255,.8);cursor:pointer;transition:all .2s}
+.htab.active{background:#fff;color:var(--green);border-color:#fff}
+.hdr-tabs{display:flex;gap:6px}
+
+/* EVENT BANNER */
+.event-banner{background:linear-gradient(135deg,#1a4a2e,#2d7a4f);padding:24px 20px;text-align:center;color:#fff}
+.event-title{font-size:1.5rem;font-weight:800;margin-bottom:4px;line-height:1.3}
+.event-sub{font-size:.8rem;color:rgba(255,255,255,.8);margin-bottom:16px}
+.event-pills{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:12px}
+.epill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:6px 14px;font-size:.78rem;color:#fff;display:flex;align-items:center;gap:5px}
+
+/* SPOTS COUNTER */
+.spots-bar{background:var(--gold2);border-bottom:2px solid var(--gold);padding:12px 20px;text-align:center}
+.spots-inner{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.spots-num{font-size:1.8rem;font-weight:800;color:var(--green)}
+.spots-lbl{font-size:.78rem;color:var(--t2)}
+.spots-bar-wrap{width:200px;height:8px;background:#ddd;border-radius:999px;overflow:hidden}
+.spots-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),#4caf50);border-radius:999px;transition:width .5s}
+
+/* MAIN */
+.main{flex:1;padding:20px 16px;max-width:560px;margin:0 auto;width:100%}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rmd);padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card-title{font-size:.7rem;font-weight:700;color:var(--green);letter-spacing:1.5px;margin-bottom:16px;text-transform:uppercase}
+
+/* FORM */
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:.7rem;font-weight:700;color:var(--t2);letter-spacing:.5px;margin-bottom:5px;text-transform:uppercase}
+.req{color:var(--red)}
+.fi{width:100%;padding:12px 14px;background:var(--s2);border:1.5px solid var(--b1);border-radius:var(--rsm);color:var(--t1);font-size:.92rem;outline:none;transition:border-color .2s;font-family:inherit}
+.fi:focus{border-color:var(--green);background:#fff}
+.fi::placeholder{color:var(--t3)}
+
+/* BUTTONS */
+.btn{padding:13px 22px;border-radius:var(--rsm);font-weight:700;font-size:.9rem;border:none;cursor:pointer;transition:all .2s}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:#145e30}
+.btn-green:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:transparent;border:1.5px solid var(--b1);color:var(--t2)}
+.btn-ghost:hover{border-color:var(--t1);color:var(--t1)}
+.btn-red{background:rgba(192,57,43,.1);border:1.5px solid rgba(192,57,43,.3);color:var(--red)}
+.btn-full{width:100%}
+
+/* ALERTS */
+.al{padding:12px 14px;border-radius:var(--rsm);font-size:.82rem;margin-bottom:12px}
+.al-err{background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.25);color:var(--red)}
+.al-ok{background:var(--green2);border:1px solid rgba(26,122,63,.25);color:var(--green)}
+.al-info{background:#e8f4fd;border:1px solid #bee3f8;color:#1a5276}
+.al-warn{background:var(--gold2);border:1px solid rgba(200,146,42,.3);color:var(--gold)}
+
+/* SUCCESS */
+.success{display:none;text-align:center;padding:24px 0}
+.success-icon{font-size:3.5rem;margin-bottom:10px}
+.success-title{font-size:1.15rem;font-weight:800;color:var(--green);margin-bottom:6px}
+.success-sub{font-size:.82rem;color:var(--t2);line-height:1.6;margin-bottom:6px}
+.success-token{font-size:1.4rem;font-weight:800;color:var(--green);background:var(--green2);border:2px solid var(--green);border-radius:var(--rsm);padding:8px 20px;display:inline-block;margin:10px 0}
+
+/* CLOSED BANNER */
+.closed-banner{background:rgba(192,57,43,.06);border:2px solid rgba(192,57,43,.2);border-radius:var(--rmd);padding:30px 20px;text-align:center;margin-bottom:16px}
+
+/* ADMIN */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat-box{background:var(--s2);border:1px solid var(--b1);border-radius:var(--rsm);padding:14px;text-align:center}
+.stat-num{font-size:1.8rem;font-weight:800;color:var(--green)}
+.stat-lbl{font-size:.65rem;color:var(--t3);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+.tbl-wrap{overflow-x:auto;border-radius:var(--rsm);border:1px solid var(--b1)}
+.dtbl{width:100%;border-collapse:collapse;font-size:.78rem}
+.dtbl th{padding:9px 10px;text-align:left;color:var(--t2);font-size:.62rem;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--b1);background:var(--s2);white-space:nowrap}
+.dtbl td{padding:9px 10px;border-bottom:1px solid rgba(0,0,0,.05);vertical-align:middle}
+.dtbl tr:last-child td{border-bottom:none}
+.dtbl tr:hover td{background:var(--s2)}
+.token-badge{background:var(--green2);color:var(--green);border:1px solid rgba(26,122,63,.3);padding:2px 8px;border-radius:999px;font-size:.68rem;font-weight:700}
+.filter-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.fpill{padding:5px 14px;border-radius:999px;font-size:.72rem;font-weight:700;border:1.5px solid var(--b1);background:transparent;color:var(--t2);cursor:pointer;transition:all .2s}
+.fpill.act{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.del-btn{background:transparent;border:none;color:var(--t3);cursor:pointer;font-size:.88rem;padding:3px 6px;border-radius:4px;transition:all .2s}
+.del-btn:hover{color:var(--red)}
+.login-wrap{max-width:320px;margin:40px auto}
+.mono{font-family:'Courier New',monospace}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;animation:spin .8s linear infinite}
+
+/* FOOTER */
+.footer{background:#1a4a2e;color:rgba(255,255,255,.7);padding:16px;text-align:center;font-size:.75rem}
+.footer strong{color:#fff}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-brand">
+      <div class="hdr-logo">🚶</div>
+      <div>
+        <div class="hdr-title">Walkathon 2026 — ONGC</div>
+        <div class="hdr-sub">Thanthai Periyar Birth Anniversary</div>
+      </div>
+    </div>
+    <div class="hdr-tabs">
+      <button class="htab active" id="tab-reg"   onclick="showTab('reg')">Register</button>
+      <button class="htab"        id="tab-admin" onclick="showTab('admin')">Admin</button>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT BANNER -->
+<div class="event-banner" id="evt-banner">
+  <div class="event-title">🎉 Walkathon 2026</div>
+  <div class="event-sub">On the Birth Anniversary of Thanthai Periyarji</div>
+  <div class="event-pills">
+    <div class="epill">📅 17th September 2026</div>
+    <div class="epill">🕕 Reporting: 6:00 PM</div>
+    <div class="epill">📍 Behind Subir Raha Museum</div>
+    <div class="epill">👥 First 250 Participants</div>
+  </div>
+</div>
+
+<!-- SPOTS BAR -->
+<div class="spots-bar" id="spots-bar">
+  <div class="spots-inner">
+    <div>
+      <div class="spots-num" id="spots-left">—</div>
+      <div class="spots-lbl">Spots Remaining</div>
+    </div>
+    <div class="spots-bar-wrap">
+      <div class="spots-bar-fill" id="spots-fill" style="width:0%"></div>
+    </div>
+    <div>
+      <div class="spots-num" id="spots-taken">—</div>
+      <div class="spots-lbl">Registered</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- REGISTER PAGE -->
+  <div id="page-reg">
+
+    <!-- Closed banner -->
+    <div id="closed-banner" class="closed-banner" style="display:none">
+      <div style="font-size:2rem;margin-bottom:8px">🔒</div>
+      <div style="font-size:1.1rem;font-weight:800;color:var(--red);margin-bottom:6px">Registration Closed</div>
+      <div style="font-size:.85rem;color:var(--t2)">All 250 spots have been filled.<br>See you at the Walkathon on 17th September!</div>
+    </div>
+
+    <div class="card" id="reg-card">
+      <div class="card-title">📋 Participant Registration</div>
+
+      <div id="reg-notice" style="display:none;margin-bottom:14px"></div>
+
+      <div id="reg-form">
+        <div class="fg">
+          <label>Full Name <span class="req">*</span></label>
+          <input class="fi" id="n-name" placeholder="Your full name"/>
+        </div>
+        <div class="fg">
+          <label>CPF / Employee ID <span class="req">*</span></label>
+          <input class="fi mono" id="n-cpf" placeholder="e.g. 12345" maxlength="7" inputmode="numeric"/>
+        </div>
+        <div class="fg">
+          <label>Mobile Number <span class="req">*</span></label>
+          <input class="fi mono" id="n-mob" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric"/>
+        </div>
+        <div class="fg">
+          <label>Email Address <span class="req">*</span></label>
+          <input class="fi" id="n-email" placeholder="your.email@ongc.co.in" type="email" inputmode="email"/>
+        </div>
+        <div id="reg-err" class="al al-err" style="display:none"></div>
+        <button class="btn btn-green btn-full" id="reg-btn" onclick="submitReg()">
+          🚶 Register for Walkathon
+        </button>
+        <div style="font-size:.7rem;color:var(--t3);text-align:center;margin-top:8px">
+          A confirmation email will be sent to your email address
+        </div>
+      </div>
+
+      <!-- Success -->
+      <div class="success" id="reg-ok">
+        <div class="success-icon">✅</div>
+        <div class="success-title">Registration Confirmed!</div>
+        <div class="success-sub">Your participation token:</div>
+        <div class="success-token" id="reg-token">#001</div>
+        <div class="success-sub" id="reg-ok-msg"></div>
+        <div class="al al-info" style="text-align:left;margin-top:12px">
+          📧 A confirmation email has been sent to your email address.<br>
+          📅 <strong>17th September 2026</strong> · 6:00 PM<br>
+          📍 Behind Subir Raha Museum
+        </div>
+        <button class="btn btn-ghost" style="margin-top:16px" onclick="resetReg()">Register Another Person</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PAGE -->
+  <div id="page-admin" style="display:none">
+    <div id="admin-login" class="login-wrap">
+      <div class="card">
+        <div class="card-title">🔐 Admin Access</div>
+        <div class="fg">
+          <label>Password</label>
+          <input class="fi" id="adm-pass" type="password" placeholder="Admin password"
+            onkeydown="if(event.key==='Enter')adminLogin()"/>
+        </div>
+        <div id="login-err" class="al al-err" style="display:none"></div>
+        <button class="btn btn-green btn-full" onclick="adminLogin()">Login</button>
+      </div>
+    </div>
+
+    <div id="admin-dash" style="display:none">
+
+      <div class="card">
+        <div class="card-title">⚙️ Settings</div>
+        <div class="fg">
+          <label>Notice for Participants</label>
+          <input class="fi" id="adm-notice" placeholder="e.g. Wear comfortable shoes, carry water bottle"/>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-green" onclick="saveNotice()">💾 Save Notice</button>
+          <button class="btn btn-ghost" onclick="fetchParticipants()">🔄 Refresh</button>
+        </div>
+        <div id="adm-status" style="display:none;margin-top:12px"></div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-num" id="st-total">0</div><div class="stat-lbl">Registered</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:var(--gold)" id="st-left">250</div><div class="stat-lbl">Spots Left</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:var(--red)" id="st-pct">0%</div><div class="stat-lbl">Filled</div></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-green" onclick="dlXLSX()">⬇ Download XLSX</button>
+        <button class="btn btn-red"   onclick="clearAll()">🗑 Clear All</button>
+      </div>
+
+      <div class="tbl-wrap">
+        <table class="dtbl">
+          <thead><tr><th>Token</th><th>Name</th><th>CPF/ID</th><th>Mobile</th><th>Email</th><th>Registered</th><th></th></tr></thead>
+          <tbody id="adm-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div>For queries contact: <strong>Alok Kumar Dudwe · Manager Programming · 📱 9407407147</strong></div>
+  <div style="margin-top:4px">ONGC · EDS Department · Northern Region</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+'use strict';
+
+// ── CONFIG ─────────────────────────────────
+const ADMIN_PASS   = 'walk2026';
+const MAX_SPOTS    = 250;
+const SETTINGS_KEY = 'walkathon_cfg';
+// !! PASTE YOUR APPS SCRIPT URL BELOW AFTER DEPLOYMENT !!
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxMSeiSwr0g4bee1SW10y3RtKad1Nh33cO4v1tGhvBQ-Ynk1b7hVXmX7jXpScmlmkw/exec';
+
+// ── SETTINGS ───────────────────────────────
+function getCfg(){ try{ return JSON.parse(localStorage.getItem(SETTINGS_KEY))||{}; }catch(e){ return {}; } }
+function setCfg(o){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(o)); }
+
+// ── JSONP ───────────────────────────────────
+function gas(action, params){
+  return new Promise((resolve, reject) => {
+    if(!GAS_URL || GAS_URL === 'PASTE_YOUR_APPS_SCRIPT_URL_HERE'){
+      reject(new Error('Apps Script URL not configured. Contact admin.')); return;
+    }
+    let url = GAS_URL + '?action=' + encodeURIComponent(action);
+    if(params) Object.entries(params).forEach(([k,v]) => {
+      url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(v == null ? '' : v);
+    });
+    const cb = '_w' + Date.now() + '_' + Math.floor(Math.random()*9999);
+    url += '&callback=' + cb;
+    const timer = setTimeout(() => { cleanup(); reject(new Error('Request timed out.')); }, 15000);
+    function cleanup(){ clearTimeout(timer); delete window[cb]; const s=document.getElementById(cb); if(s) s.parentNode.removeChild(s); }
+    window[cb] = function(data){ cleanup(); resolve(data); };
+    const script = document.createElement('script');
+    script.id = cb; script.src = url;
+    script.onerror = function(){ cleanup(); reject(new Error('Failed to connect to server.')); };
+    document.head.appendChild(script);
+  });
+}
+
+// ── TABS ────────────────────────────────────
+function showTab(t){
+  document.getElementById('page-reg').style.display   = t==='reg'  ?'block':'none';
+  document.getElementById('page-admin').style.display = t==='admin'?'block':'none';
+  document.getElementById('tab-reg').className   = 'htab'+(t==='reg'  ?' active':'');
+  document.getElementById('tab-admin').className = 'htab'+(t==='admin'?' active':'');
+  if(t==='reg') fetchCount();
+}
+
+// ── SPOTS COUNTER ───────────────────────────
+async function fetchCount(){
+  try{
+    const d = await gas('get');
+    if(d.ok) updateSpots(d.total||0);
+  }catch(e){ /* silent */ }
+}
+
+function updateSpots(total){
+  const left = Math.max(0, MAX_SPOTS - total);
+  const pct  = Math.min(100, Math.round(total/MAX_SPOTS*100));
+  document.getElementById('spots-left').textContent  = left;
+  document.getElementById('spots-taken').textContent = total;
+  document.getElementById('spots-fill').style.width  = pct + '%';
+
+  // Show closed banner if full
+  const closed = total >= MAX_SPOTS;
+  document.getElementById('closed-banner').style.display = closed ? 'block' : 'none';
+  document.getElementById('reg-card').style.display      = closed ? 'none'  : 'block';
+
+  // Change color when almost full
+  if(left <= 25){
+    document.getElementById('spots-left').style.color = '#c0392b';
+    document.getElementById('spots-fill').style.background = 'linear-gradient(90deg,#c0392b,#e74c3c)';
+  }
+}
+
+// ── REGISTRATION ────────────────────────────
+function showErr(m){ const e=document.getElementById('reg-err'); e.textContent=m; e.style.display='block'; }
+function hideErr(){ document.getElementById('reg-err').style.display='none'; }
+
+// Show notice if set
+function applyNotice(){
+  const cfg = getCfg();
+  const el  = document.getElementById('reg-notice');
+  if(cfg.notice && el){
+    el.innerHTML='<div class="al al-warn">📌 '+cfg.notice+'</div>';
+    el.style.display='block';
+  }
+}
+
+async function submitReg(){
+  hideErr();
+  const name  = document.getElementById('n-name').value.trim();
+  const cpf   = document.getElementById('n-cpf').value.trim();
+  const mob   = document.getElementById('n-mob').value.trim();
+  const email = document.getElementById('n-email').value.trim();
+
+  if(!name)                          { showErr('Please enter your full name.'); return; }
+  if(!cpf || !/^\d{4,7}$/.test(cpf)){ showErr('Please enter a valid numeric Employee ID (4–7 digits).'); return; }
+  if(!mob  || !/^\d{10}$/.test(mob)) { showErr('Please enter a valid 10-digit mobile number.'); return; }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showErr('Please enter a valid email address.'); return; }
+
+  const btn = document.getElementById('reg-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin">⏳</span> Registering…';
+
+  try{
+    const res = await gas('add', { name, cpf, mob, email });
+    btn.disabled = false;
+    btn.innerHTML = '🚶 Register for Walkathon';
+
+    if(res.ok){
+      document.getElementById('reg-form').style.display = 'none';
+      document.getElementById('reg-ok').style.display   = 'block';
+      document.getElementById('reg-token').textContent  = '#' + String(res.token).padStart(3,'0');
+      document.getElementById('reg-ok-msg').textContent =
+        'Welcome ' + name + '! See you on 17th September at 6:00 PM behind Subir Raha Museum. A confirmation email has been sent to ' + email;
+      fetchCount();
+    } else {
+      showErr(res.error || 'Registration failed. Please try again.');
+    }
+  }catch(e){
+    btn.disabled = false;
+    btn.innerHTML = '🚶 Register for Walkathon';
+    showErr('Connection error — ' + e.message);
+  }
+}
+
+function resetReg(){
+  ['n-name','n-cpf','n-mob','n-email'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('reg-form').style.display = 'block';
+  document.getElementById('reg-ok').style.display   = 'none';
+  hideErr();
+}
+
+// ── ADMIN LOGIN ─────────────────────────────
+function adminLogin(){
+  if(document.getElementById('adm-pass').value === ADMIN_PASS){
+    document.getElementById('admin-login').style.display = 'none';
+    document.getElementById('admin-dash').style.display  = 'block';
+    const cfg = getCfg();
+    document.getElementById('adm-notice').value = cfg.notice||'';
+    fetchParticipants();
+  } else {
+    const el = document.getElementById('login-err');
+    el.textContent = 'Incorrect password.'; el.style.display = 'block';
+  }
+}
+
+function saveNotice(){
+  const cfg = getCfg();
+  cfg.notice = document.getElementById('adm-notice').value.trim();
+  setCfg(cfg);
+  applyNotice();
+  setStatus('✅ Notice saved!','ok');
+}
+
+function setStatus(msg,type){
+  const el = document.getElementById('adm-status');
+  el.className = 'al al-'+(type==='ok'?'ok':type==='err'?'err':'info');
+  el.textContent = msg; el.style.display = 'block';
+}
+
+// ── ADMIN DATA ──────────────────────────────
+let participants = [];
+
+async function fetchParticipants(){
+  setStatus('🔄 Loading from Google Sheet…','info');
+  try{
+    const d = await gas('get');
+    if(d.ok){
+      participants = d.players||[];
+      renderTable();
+      const left = Math.max(0, MAX_SPOTS - participants.length);
+      const pct  = Math.round(participants.length/MAX_SPOTS*100);
+      document.getElementById('st-total').textContent = participants.length;
+      document.getElementById('st-left').textContent  = left;
+      document.getElementById('st-pct').textContent   = pct+'%';
+      setStatus('✅ '+participants.length+' registrations loaded.','ok');
+    } else {
+      setStatus('❌ '+(d.error||'Unknown error'),'err');
+    }
+  }catch(e){
+    setStatus('❌ '+e.message,'err');
+  }
+}
+
+function renderTable(){
+  if(!participants.length){
+    document.getElementById('adm-tbody').innerHTML =
+      '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--t3)">No registrations yet.</td></tr>';
+    return;
+  }
+  document.getElementById('adm-tbody').innerHTML = participants.map((p,i) =>
+    '<tr>'
+    + '<td><span class="token-badge">#'+String(p.token||i+1).padStart(3,'0')+'</span></td>'
+    + '<td><strong>'+p.name+'</strong></td>'
+    + '<td class="mono" style="color:var(--green)">'+p.cpf+'</td>'
+    + '<td class="mono">'+p.mob+'</td>'
+    + '<td style="font-size:.72rem;color:var(--t2)">'+p.email+'</td>'
+    + '<td style="font-size:.7rem;color:var(--t3)">'+( p.ts||'—')+'</td>'
+    + '<td><button class="del-btn" onclick="delParticipant('+p.id+')">🗑</button></td>'
+    + '</tr>'
+  ).join('');
+}
+
+async function delParticipant(id){
+  if(!confirm('Delete this registration?')) return;
+  try{
+    const r = await gas('delete',{id});
+    if(r.ok){ participants=participants.filter(p=>p.id!==id); renderTable(); setStatus('Deleted.','ok'); }
+    else alert('Delete failed: '+(r.error||'unknown'));
+  }catch(e){ alert('Error: '+e.message); }
+}
+
+async function clearAll(){
+  if(!confirm('Delete ALL registrations? This cannot be undone!')) return;
+  if(!confirm('Final confirmation — clear everything?')) return;
+  try{
+    const r = await gas('clearAll');
+    if(r.ok){ participants=[]; renderTable(); updateSpots(0); setStatus('✅ All cleared.','ok'); }
+    else alert('Failed: '+(r.error||'unknown'));
+  }catch(e){ alert('Error: '+e.message); }
+}
+
+// ── XLSX ────────────────────────────────────
+function dlXLSX(){
+  if(!participants.length){ alert('No data. Click Refresh first.'); return; }
+  const wb  = XLSX.utils.book_new();
+  const rows = [['Token','Name','CPF/ID','Mobile','Email','Registered On']];
+  participants.forEach(p => rows.push([
+    '#'+String(p.token||'').padStart(3,'0'), p.name, p.cpf, p.mob, p.email, p.ts||''
+  ]));
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch:8},{wch:28},{wch:10},{wch:14},{wch:30},{wch:18}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Walkathon 2026');
+  XLSX.writeFile(wb, 'Walkathon_2026_Registrations_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+
+// ── INIT ────────────────────────────────────
+applyNotice();
+fetchCount();
+</script>
+</body>
+</html>
