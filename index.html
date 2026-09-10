@@ -318,7 +318,7 @@ const ADMIN_PASS   = 'walk2026';
 const MAX_SPOTS    = 250;
 const SETTINGS_KEY = 'walkathon_cfg';
 // !! PASTE YOUR APPS SCRIPT URL BELOW AFTER DEPLOYMENT !!
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-6nu5vnfrNvrazblV5VU4m_Rw4t1UC1fb_FcH0DVRBLpVbu5Bd6UM2K0s0FFwwu0/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwmkOIQCTc_YEW5EfMnlUKeqCaepcvZBJsemSu-gwEXVuCO2I0_eJ66Nt3XVilbNRs/exec';
 
 // ── SETTINGS ───────────────────────────────
 function getCfg(){ try{ return JSON.parse(localStorage.getItem(SETTINGS_KEY))||{}; }catch(e){ return {}; } }
@@ -511,7 +511,7 @@ function renderTable(){
     + '<td><strong>'+p.name+'</strong></td>'
     + '<td class="mono" style="color:var(--green)">'+p.cpf+'</td>'
     + '<td class="mono">'+p.mob+'</td>'
-    + '<td style="font-size:.75rem">'+(p.gender==='Male'?'👨 Male':p.gender==='Female'?'👩 Female':'<span style="color:var(--t3)">—</span>')+'</td>'
+    + '<td style="font-size:.75rem">'+((p.gender&&p.gender!=='—'?(p.gender==='Male'?'👨 Male':'👩 Female'):'<span style="color:var(--t3)">—</span>'))+'</td>'
     + '<td><span style="background:#e8f5ee;color:var(--green);border:1px solid #a3d9b1;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:700">'+( p.tshirt||'—')+'</span></td>'
     + '<td style="font-size:.72rem;color:var(--t2)">'+p.email+'</td>'
     + '<td style="font-size:.7rem;color:var(--t3)">'+( p.ts||'—')+'</td>'
