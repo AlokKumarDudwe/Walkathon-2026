@@ -205,28 +205,24 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
         </div>
         <div class="fg">
           <label>Gender <span class="req">*</span></label>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div class="gen-card" id="gen-m" onclick="pickGender('M')" style="background:var(--s2);border:2px solid var(--b1);border-radius:var(--rsm);padding:12px;text-align:center;cursor:pointer;transition:all .2s">
-              <div style="font-size:1.5rem;margin-bottom:4px">👨</div>
-              <div style="font-size:.85rem;font-weight:700">Male</div>
-            </div>
-            <div class="gen-card" id="gen-f" onclick="pickGender('F')" style="background:var(--s2);border:2px solid var(--b1);border-radius:var(--rsm);padding:12px;text-align:center;cursor:pointer;transition:all .2s">
-              <div style="font-size:1.5rem;margin-bottom:4px">👩</div>
-              <div style="font-size:.85rem;font-weight:700">Female</div>
-            </div>
-          </div>
+          <select class="fi" id="n-gender">
+            <option value="">— Select Gender —</option>
+            <option value="Male">👨 Male</option>
+            <option value="Female">👩 Female</option>
+          </select>
         </div>
         <div class="fg">
           <label>T-Shirt Size <span class="req">*</span></label>
-          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px" id="tshirt-grid">
-            <div class="sz-card" id="sz-XS" onclick="pickSize('XS')">XS</div>
-            <div class="sz-card" id="sz-S"  onclick="pickSize('S')">S</div>
-            <div class="sz-card" id="sz-M"  onclick="pickSize('M')">M</div>
-            <div class="sz-card" id="sz-L"  onclick="pickSize('L')">L</div>
-            <div class="sz-card" id="sz-XL" onclick="pickSize('XL')">XL</div>
-            <div class="sz-card" id="sz-XXL" onclick="pickSize('XXL')" style="grid-column:span 2">XXL</div>
-            <div class="sz-card" id="sz-XXXL" onclick="pickSize('XXXL')" style="grid-column:span 3">XXXL</div>
-          </div>
+          <select class="fi" id="n-tshirt">
+            <option value="">— Select T-Shirt Size —</option>
+            <option value="XS">XS — Extra Small</option>
+            <option value="S">S — Small</option>
+            <option value="M">M — Medium</option>
+            <option value="L">L — Large</option>
+            <option value="XL">XL — Extra Large</option>
+            <option value="XXL">XXL — Double Extra Large</option>
+            <option value="XXXL">XXXL — Triple Extra Large</option>
+          </select>
         </div>
         <div id="reg-err" class="al al-err" style="display:none"></div>
         <button class="btn btn-green btn-full" id="reg-btn" onclick="submitReg()">
@@ -322,7 +318,7 @@ const ADMIN_PASS   = 'walk2026';
 const MAX_SPOTS    = 250;
 const SETTINGS_KEY = 'walkathon_cfg';
 // !! PASTE YOUR APPS SCRIPT URL BELOW AFTER DEPLOYMENT !!
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwpwioL7zSxaJAKk1PAlP6VsZX9zn2qi2GsLew7O_2zjPZiZBl34mIl7blYW4MBOgg/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbypIFgx1ORWrADnvZKrHDPf9atmR-HaUSdlP6A1cqvWbaYVBYHinK5ExRXLeV2VU4k/exec';
 
 // ── SETTINGS ───────────────────────────────
 function getCfg(){ try{ return JSON.parse(localStorage.getItem(SETTINGS_KEY))||{}; }catch(e){ return {}; } }
@@ -387,21 +383,6 @@ function updateSpots(total){
 }
 
 // ── REGISTRATION ────────────────────────────
-let selGender='', selSize='';
-
-function pickGender(g){
-  selGender=g;
-  document.getElementById('gen-m').className='gen-card'+(g==='M'?' sel-m':'');
-  document.getElementById('gen-f').className='gen-card'+(g==='F'?' sel-f':'');
-}
-
-function pickSize(s){
-  selSize=s;
-  document.querySelectorAll('.sz-card').forEach(el=>el.classList.remove('sel'));
-  const el=document.getElementById('sz-'+s);
-  if(el) el.classList.add('sel');
-}
-
 function showErr(m){ const e=document.getElementById('reg-err'); e.textContent=m; e.style.display='block'; }
 function hideErr(){ document.getElementById('reg-err').style.display='none'; }
 
@@ -426,15 +407,17 @@ async function submitReg(){
   if(!cpf || !/^\d{4,7}$/.test(cpf)){ showErr('Please enter a valid numeric Employee ID (4–7 digits).'); return; }
   if(!mob  || !/^\d{10}$/.test(mob)) { showErr('Please enter a valid 10-digit mobile number.'); return; }
   if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showErr('Please enter a valid email address.'); return; }
-  if(!selGender){ showErr('Please select your gender.'); return; }
-  if(!selSize)  { showErr('Please select your T-Shirt size.'); return; }
+  const gender = document.getElementById('n-gender').value;
+  const tshirt = document.getElementById('n-tshirt').value;
+  if(!gender){ showErr('Please select your gender.'); return; }
+  if(!tshirt){ showErr('Please select your T-Shirt size.'); return; }
 
   const btn = document.getElementById('reg-btn');
   btn.disabled = true;
   btn.innerHTML = '<span class="spin">⏳</span> Registering…';
 
   try{
-    const res = await gas('add', { name, cpf, mob, email, gender:selGender, tshirt:selSize });
+    const res = await gas('add', { name, cpf, mob, email, gender, tshirt });
     btn.disabled = false;
     btn.innerHTML = '🚶 Register for Walkathon';
 
@@ -457,9 +440,8 @@ async function submitReg(){
 
 function resetReg(){
   ['n-name','n-cpf','n-mob','n-email'].forEach(id => document.getElementById(id).value = '');
-  selGender=''; selSize='';
-  ['gen-m','gen-f'].forEach(id=>document.getElementById(id).className='gen-card');
-  document.querySelectorAll('.sz-card').forEach(el=>el.classList.remove('sel'));
+  document.getElementById('n-gender').value='';
+  document.getElementById('n-tshirt').value='';
   document.getElementById('reg-form').style.display = 'block';
   document.getElementById('reg-ok').style.display   = 'none';
   hideErr();
