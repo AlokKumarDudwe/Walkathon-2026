@@ -138,7 +138,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
   <div class="event-sub">On the Birth Anniversary of Thanthai Periyarji</div>
   <div class="event-pills">
     <div class="epill">📅 17th September 2026</div>
-    <div class="epill">🕕 Reporting: 6:00 PM</div>
+    <div class="epill">🕕 Reporting: 6:00 AM</div>
     <div class="epill">📍 Behind Subir Raha Museum</div>
     <div class="epill">👥 First 250 Participants</div>
   </div>
@@ -309,11 +309,11 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
 'use strict';
 
 // ── CONFIG ─────────────────────────────────
-const ADMIN_PASS   = 'walk2026';
+const ADMIN_PASS   = 'ongctt2026';
 const MAX_SPOTS    = 250;
 const SETTINGS_KEY = 'walkathon_cfg';
 // !! PASTE YOUR APPS SCRIPT URL BELOW AFTER DEPLOYMENT !!
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxGMorpcrl4mR6qqpzn3eiCAEKdDB9t4W4C5tI4ORfK8JmjxVTy0zqpy-Bf6S_Llew/exec';
+const GAS_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
 
 // ── SETTINGS ───────────────────────────────
 function getCfg(){ try{ return JSON.parse(localStorage.getItem(SETTINGS_KEY))||{}; }catch(e){ return {}; } }
@@ -434,7 +434,7 @@ async function submitReg(){
       document.getElementById('reg-ok').style.display   = 'block';
       document.getElementById('reg-token').textContent  = '#' + String(res.token).padStart(3,'0');
       document.getElementById('reg-ok-msg').textContent =
-        'Welcome ' + name + '! See you on 17th September at 6:00 PM behind Subir Raha Museum. A confirmation email has been sent to ' + email;
+        'Welcome ' + name + '! See you on 17th September at 6:00 AM behind Subir Raha Museum. A confirmation email has been sent to ' + email;
       fetchCount();
     } else {
       showErr(res.error || 'Registration failed. Please try again.');
