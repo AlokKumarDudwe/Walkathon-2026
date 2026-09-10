@@ -142,6 +142,13 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
     <div class="epill">📍 Behind Subir Raha Museum</div>
     <div class="epill">👥 First 250 Participants</div>
   </div>
+  <div style="margin-top:14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:var(--rsm);padding:10px 16px;display:inline-block">
+    <div style="font-size:.68rem;color:rgba(255,255,255,.7);letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px">Organised By</div>
+    <div style="font-size:.88rem;font-weight:700;color:#fff">All India ONGC OBC &amp; MOBC EWA</div>
+    <div style="font-size:.78rem;color:rgba(255,255,255,.85)">Dehradun</div>
+  </div>
+  <div style="display:none">
+  </div>
 </div>
 
 <!-- SPOTS BAR -->
@@ -239,8 +246,9 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
         <div class="success-sub" id="reg-ok-msg"></div>
         <div class="al al-info" style="text-align:left;margin-top:12px">
           📧 A confirmation email has been sent to your email address.<br>
-          📅 <strong>17th September 2026</strong> · 6:00 PM<br>
-          📍 Behind Subir Raha Museum
+          📅 <strong>17th September 2026</strong> · 6:00 AM<br>
+          📍 Behind Subir Raha Museum<br>
+          🏛️ <strong>Organised by:</strong> All India ONGC OBC &amp; MOBC EWA, Dehradun
         </div>
         <button class="btn btn-ghost" style="margin-top:16px" onclick="resetReg()">Register Another Person</button>
       </div>
@@ -301,7 +309,8 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
 <!-- FOOTER -->
 <div class="footer">
   <div>For queries contact: <strong>Alok Kumar Dudwe · Manager Programming · 📱 9407407147</strong></div>
-  <div style="margin-top:4px">ONGC · EDS Department · Northern Region</div>
+  <div style="margin-top:4px">Organised by: <strong style="color:#fff">All India ONGC OBC &amp; MOBC EWA, Dehradun</strong></div>
+  <div style="margin-top:2px;font-size:.68rem">ONGC · EDS Department · Northern Region</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -313,7 +322,7 @@ const ADMIN_PASS   = 'walk2026';
 const MAX_SPOTS    = 250;
 const SETTINGS_KEY = 'walkathon_cfg';
 // !! PASTE YOUR APPS SCRIPT URL BELOW AFTER DEPLOYMENT !!
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbx1AshVgOQhv2tuOlyv5ma3ySxtim4rvdc_Hs9pYVXGNAWEsnq3R_eNM776nVxSVg8/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyd0o124NK2KBSGhLgISRI38eCOZdF4_CMKA8DxdQBFQ6YN1dP4SBRKMPxSpZBZlJY/exec';
 
 // ── SETTINGS ───────────────────────────────
 function getCfg(){ try{ return JSON.parse(localStorage.getItem(SETTINGS_KEY))||{}; }catch(e){ return {}; } }
