@@ -322,7 +322,7 @@ const ADMIN_PASS   = 'walk2026';
 const MAX_SPOTS    = 250;
 const SETTINGS_KEY = 'walkathon_cfg';
 // !! PASTE YOUR APPS SCRIPT URL BELOW AFTER DEPLOYMENT !!
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyd0o124NK2KBSGhLgISRI38eCOZdF4_CMKA8DxdQBFQ6YN1dP4SBRKMPxSpZBZlJY/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwpwioL7zSxaJAKk1PAlP6VsZX9zn2qi2GsLew7O_2zjPZiZBl34mIl7blYW4MBOgg/exec';
 
 // ── SETTINGS ───────────────────────────────
 function getCfg(){ try{ return JSON.parse(localStorage.getItem(SETTINGS_KEY))||{}; }catch(e){ return {}; } }
@@ -529,7 +529,7 @@ function renderTable(){
     + '<td><strong>'+p.name+'</strong></td>'
     + '<td class="mono" style="color:var(--green)">'+p.cpf+'</td>'
     + '<td class="mono">'+p.mob+'</td>'
-    + '<td style="font-size:.75rem">'+(p.gender==='Male'?'👨 M':'👩 F')+'</td>'
+    + '<td style="font-size:.75rem">'+(p.gender==='Male'?'👨 Male':p.gender==='Female'?'👩 Female':'<span style="color:var(--t3)">—</span>')+'</td>'
     + '<td><span style="background:#e8f5ee;color:var(--green);border:1px solid #a3d9b1;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:700">'+( p.tshirt||'—')+'</span></td>'
     + '<td style="font-size:.72rem;color:var(--t2)">'+p.email+'</td>'
     + '<td style="font-size:.7rem;color:var(--t3)">'+( p.ts||'—')+'</td>'
@@ -563,7 +563,10 @@ function dlXLSX(){
   const wb  = XLSX.utils.book_new();
   const rows = [['Token','Name','CPF/ID','Mobile','Gender','T-Shirt','Email','Registered On']];
   participants.forEach(p => rows.push([
-    '#'+String(p.token||'').padStart(3,'0'), p.name, p.cpf, p.mob, p.gender||'', p.tshirt||'', p.email, p.ts||''
+    '#'+String(p.token||'').padStart(3,'0'), p.name, p.cpf, p.mob,
+    (p.gender&&p.gender!=='—')?p.gender:'',
+    (p.tshirt&&p.tshirt!=='—')?p.tshirt:'',
+    p.email, p.ts||''
   ]));
   const ws = XLSX.utils.aoa_to_sheet(rows);
   ws['!cols'] = [{wch:8},{wch:28},{wch:10},{wch:14},{wch:8},{wch:8},{wch:30},{wch:18}];
