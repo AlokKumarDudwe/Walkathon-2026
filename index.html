@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Walkathon 2026 — ONGC Shree Periyar Birth Anniversary</title>
+<title>Walkathon 2026 — ONGC Periyar Birth Anniversary</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -122,7 +122,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
       <div class="hdr-logo">🚶</div>
       <div>
         <div class="hdr-title">Walkathon 2026 — ONGC</div>
-        <div class="hdr-sub">Shree Thanthai Periyar Birth Anniversary</div>
+        <div class="hdr-sub">Thanthai Periyar Birth Anniversary</div>
       </div>
     </div>
     <div class="hdr-tabs">
@@ -135,7 +135,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
 <!-- EVENT BANNER -->
 <div class="event-banner" id="evt-banner">
   <div class="event-title">🎉 Walkathon 2026</div>
-  <div class="event-sub">On the Birth Anniversary of Shree Thanthai Periyarji</div>
+  <div class="event-sub">On the Birth Anniversary of Thanthai Periyarji</div>
   <div class="event-pills">
     <div class="epill">📅 17th September 2026</div>
     <div class="epill">🕕 Reporting: 6:00 AM</div>
@@ -307,6 +307,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
 <div class="footer">
   <div>For queries contact: <strong>Alok Kumar Dudwe · Manager Programming · 📱 9407407147</strong></div>
   <div style="margin-top:4px">Organised by: <strong style="color:#fff">All India ONGC OBC &amp; MOBC EWA, Dehradun</strong></div>
+  <div style="margin-top:2px;font-size:.68rem">ONGC · EDS Department · Northern Region</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -387,7 +388,7 @@ function showErr(m){ const e=document.getElementById('reg-err'); e.textContent=m
 function hideErr(){ document.getElementById('reg-err').style.display='none'; }
 
 // Check if registration is open and show appropriate banners
-const REG_OPEN = new Date('2026-09-12T10:00:00');
+const REG_OPEN = new Date('2026-09-11T16:30:00');
 
 function isRegOpen(){
   return new Date() >= REG_OPEN;
@@ -409,7 +410,7 @@ function applyNotice(){
       ob.style.display='block';
       ob.innerHTML='<div class="al al-warn" style="text-align:center">'
         +'<div style="font-size:1.5rem;margin-bottom:8px">⏰</div>'
-        +'<strong>Registration Opens on 12th September 2026 at 10:00 AM</strong><br>'
+        +'<strong>Registration Opens on 11th September 2026 at 4:30 PM</strong><br>'
         +'<span style="font-size:.82rem;margin-top:4px;display:block">Please come back then to register.</span>'
         +'</div>';
     }
@@ -427,7 +428,7 @@ function applyNotice(){
 
 async function submitReg(){
   hideErr();
-  if(!isRegOpen()){ showErr('Registration is not open yet. Opens on 12th September 2026 at 10:00 AM.'); return; }
+  if(!isRegOpen()){ showErr('Registration is not open yet. Opens on 11th September 2026 at 4:30 PM.'); return; }
   const name  = document.getElementById('n-name').value.trim();
   const cpf   = document.getElementById('n-cpf').value.trim();
   const mob   = document.getElementById('n-mob').value.trim();
