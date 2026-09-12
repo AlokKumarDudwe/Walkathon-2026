@@ -294,11 +294,21 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
         <button class="btn btn-ghost" onclick="checkMailStatus()">📊 Mail Status</button>
         <button class="btn btn-red"   onclick="clearAll()">🗑 Clear All</button>
       </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <span style="font-size:.75rem;color:var(--t2);font-weight:700">Quick Select:</span>
+        <button class="btn btn-ghost" style="padding:5px 12px;font-size:.72rem" onclick="selectRange(1,90)">1–90</button>
+        <button class="btn btn-ghost" style="padding:5px 12px;font-size:.72rem" onclick="selectRange(91,180)">91–180</button>
+        <button class="btn btn-ghost" style="padding:5px 12px;font-size:.72rem" onclick="selectRange(181,250)">181–250</button>
+        <button class="btn btn-ghost" style="padding:5px 12px;font-size:.72rem" onclick="selectAll()">Select All</button>
+        <button class="btn btn-ghost" style="padding:5px 12px;font-size:.72rem" onclick="clearSelection()">Clear</button>
+        <span id="sel-count" style="font-size:.75rem;color:var(--green);font-weight:700;margin-left:4px"></span>
+        <button class="btn btn-green" id="send-sel-btn" onclick="sendMailToSelected()" style="background:#1a5276;padding:7px 14px;font-size:.78rem;margin-left:auto">📧 Send to Selected</button>
+      </div>
       <div id="mail-status" style="display:none;margin-bottom:12px"></div>
 
       <div class="tbl-wrap">
         <table class="dtbl">
-          <thead><tr><th>Token</th><th>Name</th><th>CPF/ID</th><th>Mobile</th><th>Gender</th><th>T-Shirt</th><th>Email</th><th>Date</th><th></th></tr></thead>
+          <thead><tr><th><input type="checkbox" id="chk-all" onclick="toggleAll(this)" style="width:15px;height:15px;cursor:pointer"/></th><th>Token</th><th>Name</th><th>CPF/ID</th><th>Mobile</th><th>Gender</th><th>T-Shirt</th><th>Email</th><th>Mail</th><th></th></tr></thead>
           <tbody id="adm-tbody"></tbody>
         </table>
       </div>
@@ -321,7 +331,7 @@ const ADMIN_PASS   = 'walk2026';
 const MAX_SPOTS    = 250;
 const SETTINGS_KEY = 'walkathon_cfg';
 // !! PASTE YOUR APPS SCRIPT URL BELOW AFTER DEPLOYMENT !!
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzU4V7-DsdYV7A58xoWMwanQLG93Y3rU_7XFyQcBW1Tlo6F27GmM3-bzKizHZcM7jw/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwH4OkKEMiU7IkPagqOaTy07iBcpKkG-JuRuahMJVk16PAqkagxQ-A-oBN0aAzifr8/exec';
 
 // ── SETTINGS ───────────────────────────────
 function getCfg(){ try{ return JSON.parse(localStorage.getItem(SETTINGS_KEY))||{}; }catch(e){ return {}; } }
@@ -539,18 +549,20 @@ function renderTable(){
     return;
   }
   document.getElementById('adm-tbody').innerHTML = participants.map((p,i) =>
-    '<tr>'
+    '<tr id="row-'+p.id+'">'
+    + '<td><input type="checkbox" class="row-chk" data-id="'+p.id+'" data-token="'+(p.token||i+1)+'" onchange="updateSelCount()" style="width:15px;height:15px;cursor:pointer"/></td>'
     + '<td><span class="token-badge">#'+String(p.token||i+1).padStart(3,'0')+'</span></td>'
     + '<td><strong>'+p.name+'</strong></td>'
     + '<td class="mono" style="color:var(--green)">'+p.cpf+'</td>'
     + '<td class="mono">'+p.mob+'</td>'
     + '<td style="font-size:.75rem">'+((p.gender&&p.gender!=='—'?(p.gender==='Male'?'👨 Male':'👩 Female'):'<span style="color:var(--t3)">—</span>'))+'</td>'
-    + '<td><span style="background:#e8f5ee;color:var(--green);border:1px solid #a3d9b1;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:700">'+( p.tshirt||'—')+'</span></td>'
+    + '<td><span style="background:#e8f5ee;color:var(--green);border:1px solid #a3d9b1;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:700">'+(p.tshirt||'—')+'</span></td>'
     + '<td style="font-size:.72rem;color:var(--t2)">'+p.email+'</td>'
-    + '<td style="font-size:.7rem;color:var(--t3)">'+( p.ts||'—')+'</td>'
+    + '<td style="font-size:.75rem;text-align:center">'+(p.mailSent==='YES'?'✅':'—')+'</td>'
     + '<td><button class="del-btn" onclick="delParticipant('+p.id+')">🗑</button></td>'
     + '</tr>'
   ).join('');
+  updateSelCount();
 }
 
 async function delParticipant(id){
@@ -572,6 +584,45 @@ async function clearAll(){
   }catch(e){ alert('Error: '+e.message); }
 }
 
+// ── SELECTION HELPERS ───────────────────────
+function toggleAll(cb){
+  document.querySelectorAll('.row-chk').forEach(c=>c.checked=cb.checked);
+  updateSelCount();
+}
+
+function selectRange(from, to){
+  // Uncheck all first
+  document.querySelectorAll('.row-chk').forEach(c=>c.checked=false);
+  document.querySelectorAll('.row-chk').forEach(cb=>{
+    const token = parseInt(cb.dataset.token);
+    if(token>=from && token<=to) cb.checked=true;
+  });
+  document.getElementById('chk-all').checked=false;
+  updateSelCount();
+}
+
+function selectAll(){
+  document.querySelectorAll('.row-chk').forEach(c=>c.checked=true);
+  document.getElementById('chk-all').checked=true;
+  updateSelCount();
+}
+
+function clearSelection(){
+  document.querySelectorAll('.row-chk').forEach(c=>c.checked=false);
+  document.getElementById('chk-all').checked=false;
+  updateSelCount();
+}
+
+function updateSelCount(){
+  const n = document.querySelectorAll('.row-chk:checked').length;
+  const el = document.getElementById('sel-count');
+  if(el) el.textContent = n>0 ? n+' selected' : '';
+}
+
+function getSelectedIds(){
+  return [...document.querySelectorAll('.row-chk:checked')].map(cb=>parseInt(cb.dataset.id));
+}
+
 // ── MAIL STATUS ─────────────────────────────
 async function checkMailStatus(){
   const ms = document.getElementById('mail-status');
@@ -579,19 +630,57 @@ async function checkMailStatus(){
   try{
     const r = await gas('mailStatus', {});
     if(r.ok){
-      const pct = r.total ? Math.round(r.sent/r.total*100) : 0;
-      ms.className = r.pending > 0 ? 'al al-warn' : 'al al-ok';
+      const pct   = r.total ? Math.round(r.sent/r.total*100) : 0;
+      const quota = r.quota <= 0 ? 0 : r.quota;
+      const allDone = r.pending === 0;
+      const noQuota = quota === 0;
+
+      ms.className = allDone ? 'al al-ok' : noQuota ? 'al al-err' : 'al al-warn';
       ms.innerHTML = '📊 <strong>Mail Status:</strong> '
-        + r.sent + ' sent · ' + r.pending + ' pending · ' + r.total + ' total'
-        + ' (' + pct + '%)<br>'
-        + '📬 Gmail quota remaining today: <strong>' + r.quota + '</strong>'
-        + (r.pending > 0 && r.quota < r.pending
-          ? '<br>⏰ Not enough quota today. Click "Send Mail to All" to send ' + r.quota + ' more now, then again tomorrow for the rest.'
-          : r.pending > 0
-          ? '<br>✅ Enough quota available! Click "Send Mail to All" to send remaining ' + r.pending + '.'
-          : '<br>✅ All participants have received their confirmation email!');
+        + '<strong style="color:var(--green)">' + r.sent + ' sent</strong>'
+        + ' · <strong>' + r.pending + ' pending</strong>'
+        + ' · ' + r.total + ' total (' + pct + '%)<br><br>'
+        + (allDone
+          ? '✅ <strong>All ' + r.total + ' participants have received their confirmation email!</strong>'
+          : noQuota
+          ? '🚫 <strong>Gmail quota exhausted for today.</strong><br>'
+            + '⏰ Quota resets automatically at midnight tonight.<br>'
+            + '👉 Come back tomorrow morning and use the <strong>Quick Select</strong> buttons to send in batches of 90.'
+          : '📬 Gmail quota remaining today: <strong>' + quota + '</strong><br>'
+            + '👉 Use <strong>Quick Select</strong> buttons (1–90, 91–180, 181–250) then click <strong>📧 Send to Selected</strong>.');
     }
   }catch(e){ ms.className='al al-err'; ms.textContent='❌ '+e.message; }
+}
+
+// ── SEND MAIL TO SELECTED ───────────────────
+async function sendMailToSelected(){
+  const ids = getSelectedIds();
+  if(!ids.length){ alert('Please select participants first using checkboxes or Quick Select buttons.'); return; }
+  if(!confirm('Send confirmation email to ' + ids.length + ' selected participants?')) return;
+
+  const btn = document.getElementById('send-sel-btn');
+  const ms  = document.getElementById('mail-status');
+  btn.disabled=true; btn.innerHTML='<span class="spin">⏳</span> Sending…';
+  ms.className='al al-info'; ms.textContent='📧 Sending emails to '+ids.length+' participants… please wait.'; ms.style.display='block';
+
+  try{
+    const r = await gas('sendSelected', { ids: ids.join(',') });
+    btn.disabled=false; btn.innerHTML='📧 Send to Selected';
+    if(r.ok){
+      ms.className='al al-ok';
+      ms.innerHTML='✅ Done! <strong>'+r.sent+'</strong> emails sent'
+        +(r.failed>0?' · <span style="color:var(--red)"><strong>'+r.failed+'</strong> failed (quota exhausted)</span>':'')
+        +'<br><span style="font-size:.75rem">Gmail quota remaining: '+r.quota+'</span>'
+        +(r.failed>0?'<br><span style="font-size:.75rem">⏰ Try remaining ones tomorrow after midnight.</span>':'');
+      fetchParticipants(); // refresh to show ✅ mail sent
+    } else {
+      ms.className='al al-err';
+      ms.innerHTML='❌ '+(r.error||'Failed.')+'<br><span style="font-size:.75rem">⏰ Gmail quota resets at midnight.</span>';
+    }
+  }catch(e){
+    btn.disabled=false; btn.innerHTML='📧 Send to Selected';
+    ms.className='al al-err'; ms.textContent='❌ '+e.message;
+  }
 }
 
 // ── SEND MAIL TO ALL ────────────────────────
