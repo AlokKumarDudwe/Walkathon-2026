@@ -291,6 +291,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,sans-
       <div class="btn-row">
         <button class="btn btn-green" onclick="dlXLSX()">⬇ Download XLSX</button>
         <button class="btn btn-green" id="send-all-btn" onclick="sendMailToAll()" style="background:#1a5276">📧 Send Mail to All</button>
+        <button class="btn btn-ghost" onclick="checkMailStatus()">📊 Mail Status</button>
         <button class="btn btn-red"   onclick="clearAll()">🗑 Clear All</button>
       </div>
       <div id="mail-status" style="display:none;margin-bottom:12px"></div>
@@ -320,7 +321,7 @@ const ADMIN_PASS   = 'walk2026';
 const MAX_SPOTS    = 250;
 const SETTINGS_KEY = 'walkathon_cfg';
 // !! PASTE YOUR APPS SCRIPT URL BELOW AFTER DEPLOYMENT !!
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbykSy6AIXpIAxMHFchShM-CDdjZXGvm7Le5ULTz6PbMb5L_pBeA064gEdZ5z6YTOi8/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzU4V7-DsdYV7A58xoWMwanQLG93Y3rU_7XFyQcBW1Tlo6F27GmM3-bzKizHZcM7jw/exec';
 
 // ── SETTINGS ───────────────────────────────
 function getCfg(){ try{ return JSON.parse(localStorage.getItem(SETTINGS_KEY))||{}; }catch(e){ return {}; } }
@@ -571,6 +572,28 @@ async function clearAll(){
   }catch(e){ alert('Error: '+e.message); }
 }
 
+// ── MAIL STATUS ─────────────────────────────
+async function checkMailStatus(){
+  const ms = document.getElementById('mail-status');
+  ms.className = 'al al-info'; ms.textContent = '🔄 Checking mail status…'; ms.style.display = 'block';
+  try{
+    const r = await gas('mailStatus', {});
+    if(r.ok){
+      const pct = r.total ? Math.round(r.sent/r.total*100) : 0;
+      ms.className = r.pending > 0 ? 'al al-warn' : 'al al-ok';
+      ms.innerHTML = '📊 <strong>Mail Status:</strong> '
+        + r.sent + ' sent · ' + r.pending + ' pending · ' + r.total + ' total'
+        + ' (' + pct + '%)<br>'
+        + '📬 Gmail quota remaining today: <strong>' + r.quota + '</strong>'
+        + (r.pending > 0 && r.quota < r.pending
+          ? '<br>⏰ Not enough quota today. Click "Send Mail to All" to send ' + r.quota + ' more now, then again tomorrow for the rest.'
+          : r.pending > 0
+          ? '<br>✅ Enough quota available! Click "Send Mail to All" to send remaining ' + r.pending + '.'
+          : '<br>✅ All participants have received their confirmation email!');
+    }
+  }catch(e){ ms.className='al al-err'; ms.textContent='❌ '+e.message; }
+}
+
 // ── SEND MAIL TO ALL ────────────────────────
 async function sendMailToAll(){
   if(!participants.length){ alert('No registrations loaded. Click Refresh first.'); return; }
@@ -588,13 +611,15 @@ async function sendMailToAll(){
     btn.innerHTML = '📧 Send Mail to All';
     if(r.ok){
       ms.className = 'al al-ok';
-      ms.innerHTML = '✅ Emails sent successfully!<br>'
-        + '<strong>' + r.sent + '</strong> sent'
-        + (r.failed > 0 ? ' · <strong style="color:var(--red)">' + r.failed + ' failed</strong>' : '')
-        + (r.errors && r.errors.length ? '<br><span style="font-size:.72rem">' + r.errors.join(', ') + '</span>' : '');
+      ms.innerHTML = '✅ Batch sent!<br>'
+        + '📧 <strong>' + r.sent + '</strong> sent this batch'
+        + (r.skipped > 0 ? ' · <strong>' + r.skipped + '</strong> already sent before' : '')
+        + (r.failed > 0 ? ' · <span style="color:var(--red)"><strong>' + r.failed + '</strong> pending (quota)</span>' : '')
+        + '<br><span style="font-size:.75rem;color:#555">Gmail quota remaining today: ' + (r.quota||0) + '</span>'
+        + (r.failed > 0 ? '<br><span style="font-size:.75rem;color:#555">⏰ Quota resets at midnight — run again tomorrow to send remaining.</span>' : '');
     } else {
       ms.className = 'al al-err';
-      ms.textContent = '❌ ' + (r.error || 'Failed to send emails.');
+      ms.innerHTML = '❌ ' + (r.error || 'Failed.') + '<br><span style="font-size:.75rem">⏰ Gmail quota resets at midnight. Try again tomorrow morning.</span>';
     }
   }catch(e){
     btn.disabled = false;
